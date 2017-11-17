@@ -1,0 +1,8 @@
+checkpoints
+checkpoints/*
+results
+results/*
+results_xml
+results_xml/*
+tusimple_tests
+tusimple_tests/*
