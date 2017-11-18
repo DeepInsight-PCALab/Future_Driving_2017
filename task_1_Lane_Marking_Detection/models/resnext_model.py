@@ -37,12 +37,15 @@ class ResNeXtModel(BaseModel):
 
         #def resnext101(baseWidth, cardinality, slicing):
         self.net   = resnext101(4, 32, opt.slicing)
-        if self.gpu_ids: 
-            self.net   = torch.nn.DataParallel(self.net).cuda()
+        #else:
+        #    self.net   = torch.nn.DataParallel(self.net)
 
         if not self.isTrain or opt.continue_train:
             which_epoch = opt.which_epoch
             self.load_network(self.net, 'resnext101', which_epoch)
+
+        if self.gpu_ids: 
+            self.net   = torch.nn.DataParallel(self.net).cuda()
 
         if self.isTrain:
             self.optimizer = optim.SGD(self.net.parameters(), lr = self.opt.lr, momentum = 0.9, weight_decay = 5e-4)
@@ -211,6 +214,17 @@ class ResNeXtModel(BaseModel):
                     flag[j] = 1
         return res
 
+    def scale(self, lanes, oldH, oldW):
+        y_ratio = 1.0 * oldH / self.opt.fineH
+        x_ratio = 1.0 * oldW / self.opt.fineW
+        reslanes = []
+        for lane in lanes:
+            reslane = []
+            for p in lane:
+                reslane.append((p[0] * x_ratio, p[1] * y_ratio))
+            reslanes.append(reslane)
+        return reslanes
+
     def draw_lanes(self, lanes):
         img = util.tensor2im(self.input.data[0])
         img = image_draw_line_list(img, lanes)
@@ -245,5 +259,3 @@ class ResNeXtModel(BaseModel):
         
     def save(self, label):
         self.save_network(self.net, 'resnext101', label, self.gpu_ids)
-
-

@@ -3,6 +3,7 @@
 
 from .load_annotation import *
 from .image_draw import *
+from .write import *
 
 __all__ = [
     'load_annotation',

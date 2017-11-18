@@ -9,9 +9,9 @@ from util.recorder         import Recorder                              # finish
 
 opt           = TrainOptions().parse()
 train_loader  = CustomDatasetDataLoader(opt, 'train')
-val_loader    = CustomDatasetDataLoader(opt, 'val')
+#val_loader    = CustomDatasetDataLoader(opt, 'val')
 train_dataset = train_loader.load_data()
-val_dataset   = val_loader.load_data()
+#val_dataset   = val_loader.load_data()
 
 dataset_size  = len(train_loader)
 print('#training images = %d' % dataset_size)

@@ -212,8 +212,11 @@ class Transformer():
     def gao_image_path(self, image_path):
         image = Image.open(image_path).convert('RGB')
         width, height = image.size
-        if width != self.opt.loadW or height != self.opt.loadH:
-            image = image.resize((self.opt.loadW, self.opt.loadH), Image.BILINEAR)
+        self.original_width = width
+        self.original_height = height
+        if width != self.opt.fineW or height != self.opt.fineH:
+            #image = image.resize((self.opt.loadW, self.opt.loadH), Image.BILINEAR)
+            image = image.resize((self.opt.fineW, self.opt.fineH), Image.BILINEAR)
         image = self.totensor(image)
         return image
 
