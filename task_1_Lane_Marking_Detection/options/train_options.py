@@ -19,9 +19,12 @@ class TrainOptions(BaseOptions):
         #self.parser.add_argument('--phase',            type = str, default = 'train', help = 'train, test')
         self.parser.add_argument('--which_epoch',      type = str, default = 'latest', help = 'which epoch to load? set to latest to use latest cached model')
         self.parser.add_argument('--schedule',         type = str, default = '100,150,200', help = 'learning lr schedule')
-        self.parser.add_argument('--schedule_max',     type = int, default = 200, help = 'learning lr schedule')
+        #self.parser.add_argument('--schedule_max',     type = int, default = 200, help = 'learning lr schedule')
         self.parser.add_argument('--lr',               type = float, default = 0.01, help = 'initial learning rate for adam')
         self.parser.add_argument('--debug',            type = int, default = 0,     help = 'debug to print')
+
+        self.parser.add_argument('--pretrain',         type = str, default = None,     help = 'pretrained model')
+        self.parser.add_argument('--finetune_cls',     type = int, default = 0,     help = 'choose to only finetune 2 added color and type layers')
         #self.parser.add_argument('--no_html',          action = 'store_true',          help = 'do not save intermediate training results to [opt.checkpoints]/[opt.name]/web/')
 
         self.isTrain = True

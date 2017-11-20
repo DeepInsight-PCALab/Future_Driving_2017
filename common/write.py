@@ -29,15 +29,26 @@ class XmlWriter(object):
         self.root = self.doc.createElement('opencv_storage')
         self.doc.appendChild(self.root)
     
-    def add_lanes(self, lanes, fid):
-        number = len(lanes)
+    def add_lanes(self, lanes_group, fid):
+        number = len(lanes_group)
         add_son(self.doc, self.root, 'Frame%05dTargetNumber' % fid, str(number))
         for i in xrange(number):
-            lane = lanes[i]
+            lane = lanes_group[i][0]
+            prob, color, type = lanes_group[i][1], lanes_group[i][2], lanes_group[i][3]
             cnt  = len(lane)
             pt_array = ' '.join([str(x[0])+' '+str(x[1]) for x in lane])
             a = add_son_frame(self.doc, self.root, 'Frame%05dTarget%05d' % (fid, i))
-            s = u'\'白色实线\''
+            if color > 0.5:
+                if type > 0.5:
+                    s = u'\'黄色实线\''
+                else:
+                    s = u'\'黄色虚线\''
+            else:
+                if type > 0.5:
+                    s = u'\'白色实线\''
+                else:
+                    s = u'\'白色虚线\''
+            #s = u'\'白色实线\''
             add_son(self.doc, a, 'Type', s)
             b = add_son_frame_attr(self.doc, a, 'Position', 'type_id', "opencv-matrix")
             add_son(self.doc, b, 'rows', str(cnt))

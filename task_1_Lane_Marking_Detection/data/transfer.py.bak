@@ -6,7 +6,6 @@ import random
 from collections import OrderedDict
 import torchvision.transforms as transforms
 import torch
-import itertools
 
 class Transformer():
     def __init__(self, opt):
@@ -24,22 +23,11 @@ class Transformer():
                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
         self.totensor = transforms.Compose(transforms_list)
 
-    def isout(self, p):
-        x = p[0]
-        y = p[1]
-        if 0 <= x and x < self.opt.fineW + 1 and 0 <= y and y < self.opt.fineH + 1:
-            return False
-        return True
-
-    def label_feature(self, lane_array, attr_array):
+    def label_feature(self, lane_array):
         eps = 1e-5
         # try to find positive samples
         record     = np.ones((self.opt.feaH, self.opt.feaW)) * (-1.0)
         record_min = np.ones((self.opt.feaH, self.opt.feaW)) * float('inf')
-
-        color      = torch.zeros(self.opt.feaH, self.opt.feaW)
-        type       = torch.zeros(self.opt.feaH, self.opt.feaW)
-        attr_mask  = torch.zeros(self.opt.feaH, self.opt.feaW)
         
         slice_step_y = self.opt.fineH / self.opt.slicing
         y_slices = range(0, self.opt.fineH, slice_step_y)       
@@ -75,9 +63,6 @@ class Transformer():
                         if dis < record_min[fea_y][fea_x]: # and dis < self.opt.pos_thres:
                             record_min[fea_y][fea_x] = dis
                             record[fea_y][fea_x]     = lane_id
-                            color[fea_y][fea_x]      = attr_array[lane_id][0]
-                            type[fea_y][fea_x]       = attr_array[lane_id][1]
-                            attr_mask[fea_y][fea_x]  = 1.0
 
             lane_dict.append(ldict)
 
@@ -109,9 +94,6 @@ class Transformer():
 
         res_cls      = torch.from_numpy(cls).unsqueeze(0).float() #.unsqueeze(0).float()
         res_cls_mask = torch.from_numpy(cls_mask).unsqueeze(0).float() #.unsqueeze(0).float()
-        res_color    = color.unsqueeze(0).float()
-        res_type     = type.unsqueeze(0).float()
-        res_attr_mask= attr_mask.unsqueeze(0).float()
 
         # filling up, down
         res_up        = torch.zeros((self.opt.slicing + 1, self.opt.feaH, self.opt.feaW))
@@ -145,36 +127,21 @@ class Transformer():
                 # number to regress
                 res_up[0][h][w]      = y_id
                 res_up_mask[0][h][w] = 1
-                # add three more to regress up
-                for i in xrange(3):
-                    if y_id + i - 1 >= 0:
-                        res_up[y_id + 1 + i][h][w]      = 2.0 * res_up[y_id + i][h][w] - res_up[y_id + i - 1][h][w]
-                        res_up_mask[y_id + 1 + i][h][w] = 1
                 
                 y_start = stdy + slice_step_y
                 y_id    = 0
-                out_time = 0
                 while True:
                     if not y_start in ld.keys():
                         break
                     dx = ld[y_start] - stdx
                     res_down[y_id + 1][h][w]      = dx
                     res_down_mask[y_id + 1][h][w] = 1
-
-                    # down add three more out most
-                    if self.isout([ld[y_start], y_start]):
-                        out_time += 1
-                    if out_time == 3:
-                        break
-
                     y_id    += 1
                     y_start += slice_step_y
-
                 # number to regress
                 res_down[0][h][w]      = y_id
                 res_down_mask[0][h][w] = 1
-        d = {'cls': res_cls, 'cls_mask': res_cls_mask, 'up': res_up, 'up_mask': res_up_mask, 'down': res_down, 'down_mask': res_down_mask,
-             'color': res_color, 'color_mask': res_attr_mask, 'type': res_type, 'type_mask': res_attr_mask}
+        d = {'cls': res_cls, 'cls_mask': res_cls_mask, 'up': res_up, 'up_mask': res_up_mask, 'down': res_down, 'down_mask': res_down_mask}
         #return res_cls, res_cls_mask, res_up, res_up_mask, res_down, res_down_mask
         return d
 
@@ -207,13 +174,8 @@ class Transformer():
         y_mul = 1.0 / label['originH'] * self.opt.loadH
         x_mul = 1.0 / label['originW'] * self.opt.loadW
         lane_array = []
-        attr_array = []
         std_ys = np.array(label['h_samples']) * y_mul
-
-        assert (len(label['lanes']) == len(label['color']))
-        assert (len(label['lanes']) == len(label['type']))
-
-        for lane, co, ty in itertools.izip(label['lanes'], label['color'], label['type']):
+        for lane in label['lanes']:
             #print('lane x len = ', len(lane))
             #if self.opt.debug == 1:
             #    print np.array(lane)
@@ -225,8 +187,7 @@ class Transformer():
             xs, ys, need_delete = self.last_deal(xs, std_ys)
             if not need_delete:
                 lane_array.append([xs, ys])
-                attr_array.append([co, ty])
-        return lane_array, attr_array
+        return lane_array
 
 
     def gao_image_path(self, image_path):
@@ -242,7 +203,7 @@ class Transformer():
 
 
     def gao(self, image, label, phase):
-        lane_array, attr_array = self.parse_label(label)
+        lane_array = self.parse_label(label)
         if phase == 'train':
             width, height = image.size
             if width != self.opt.loadW or height != self.opt.loadH:
@@ -267,6 +228,6 @@ class Transformer():
                     lane_array[i][0] = self.opt.fineW - 1 - lane_array[i][0]
         
         image = self.totensor(image)
-        label = self.label_feature(lane_array, attr_array)
+        label = self.label_feature(lane_array)
         #print('image.shape = ', image.shape)
         return image, label

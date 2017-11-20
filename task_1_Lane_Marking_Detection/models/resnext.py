@@ -104,6 +104,8 @@ class ResNeXt(nn.Module):
         self.layer_down= nn.Conv2d(self.inplanes, slicing + 1, kernel_size = 1, stride = 1, padding = 0, bias = True)
         #self.avgpool = nn.AvgPool2d(7)      
         #self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.layer_color = nn.Conv2d(self.inplanes, 1, kernel_size = 1, stride = 1, padding = 0, bias = True)
+        self.layer_type  = nn.Conv2d(self.inplanes, 1, kernel_size = 1, stride = 1, padding = 0, bias = True)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -139,6 +141,22 @@ class ResNeXt(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        #x = self.maxpool1(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        cls = F.sigmoid(self.layer_cls(x))
+        up  = self.layer_up(x)
+        down= self.layer_down(x)
+        color=F.sigmoid(self.layer_color(x))
+        type =F.sigmoid(self.layer_type(x))
+        return cls, up, down, color, type
+
+    def forward_bak(self, x):
         #print('x = ', x)
         x = self.conv1(x)
         x = self.bn1(x)
@@ -157,11 +175,11 @@ class ResNeXt(nn.Module):
         return cls, up, down
 
 
-def resnext50(baseWidth, cardinality):
+def resnext50(baseWidth, cardinality, slicing):
     """
     Construct ResNeXt-50.
     """
-    model = ResNeXt(baseWidth, cardinality, [3, 4, 6, 3], 1000)
+    model = ResNeXt(baseWidth, cardinality, [3, 4, 6, 3], slicing)
     return model
 
 
@@ -173,9 +191,9 @@ def resnext101(baseWidth, cardinality, slicing):
     return model
 
 
-def resnext152(baseWidth, cardinality):
+def resnext152(baseWidth, cardinality, slicing):
     """
     Construct ResNeXt-152.
     """
-    model = ResNeXt(baseWidth, cardinality, [3, 8, 36, 3], 1000)
+    model = ResNeXt(baseWidth, cardinality, [3, 8, 36, 3], slicing)
     return model
