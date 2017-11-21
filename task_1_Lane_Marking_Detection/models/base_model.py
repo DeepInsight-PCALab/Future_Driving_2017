@@ -53,6 +53,7 @@ class BaseModel(object):
 
     def load_network(self, network, network_label, epoch_label):
         save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
+        print 'load network from %s' % save_filename
         save_path     = os.path.join(self.save_dir, save_filename)
         network.load_state_dict(torch.load(save_path))
 
