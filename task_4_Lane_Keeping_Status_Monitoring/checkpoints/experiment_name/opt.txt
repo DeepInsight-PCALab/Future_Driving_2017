@@ -1,0 +1,29 @@
+------------------- Option ---------------------
+batchSize: 10
+checkpoints: ./checkpoints
+cls_thres: 0.9
+depth: 152
+display_winsize: 256
+feaH: 16
+feaW: 20
+fineH: 256
+fineW: 320
+gpu_ids: [0]
+input_nc: 3
+isTrain: False
+lam: 0.1
+lam_attr: 0.2
+loadH: 280
+loadW: 350
+model: resnext_cls
+nThreads: 2
+name: experiment_name
+neg_thres: 8
+negpos_ratio: 10
+ntest: inf
+pos_thres: 7
+results_xml_dir: ./results_xml/
+slicing: 64
+test_dir: /data3/XJTU2017/task_1/TSD-Lane/
+which_epoch: latest
+------------------- End ------------------------

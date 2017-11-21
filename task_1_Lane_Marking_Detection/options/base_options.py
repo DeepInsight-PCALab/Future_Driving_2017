@@ -24,7 +24,7 @@ class BaseOptions(object):
         self.parser.add_argument('--input_nc',    type = int, default = 3,   help = '# of input image channels')
         self.parser.add_argument('--slicing',     type = int, default = 64,  help = '# of slicing parallel lines')
         self.parser.add_argument('--model',       type = str, default = 'resnext_cls',      help = 'selects model to use')
-        self.parser.add_argument('--depth',       type = int, default = 101, help = '# of resnext depth')
+        self.parser.add_argument('--depth',       type = int, default = 152, help = '# of resnext depth')
         self.parser.add_argument('--gpu_ids',     type = str, default = '0', help = 'gpu ids: 0; 0,1,2;')
         self.parser.add_argument('--name',        type = str, default = 'experiment_name', help = 'name of the exp')
         self.parser.add_argument('--nThreads',    type = int, default = 2,   help = '# threads for loading data')

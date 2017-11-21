@@ -98,5 +98,5 @@ def writeInfoToXml(lanes, fid):
     #with codecs.open('tmp.xml', 'w', 'gbk') as f:
     #    f.write(doc.toprettyxml(indent = '\t', encoding = 'gbk'))
 
-writeInfoToXml([[1,2,3,4], [1,1,1,1,1,1,1,1]], 1)
+#writeInfoToXml([[1,2,3,4], [1,1,1,1,1,1,1,1]], 1)
 
