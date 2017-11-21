@@ -43,6 +43,29 @@ def image_draw_half_line_list(image, line_list, color = (0, 0, 255), thin = 2):
     res = res.astype(np.uint8)
     return res
 
+import random
+def image_draw_line_cls_list_dot(image, line_cls_list, color = (0, 0, 255), thin = 2):
+    img = image.copy()
+    for line_cls in line_cls_list:
+        line = line_cls[0]
+        le = len(line)
+        prob, co, ty = line_cls[1], line_cls[2], line_cls[3]
+        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+        for i in xrange(le):
+            pa = (int(line[i][0]), int(line[i][1]))
+            #cv2.line(img, pa, pb, color, thin)
+            cv2.circle
+
+        most_left = line[0] if line[0][0] < line[-1][0] else line[-1]
+        org = (int(line[le/2][0]), int(line[le/2][1]))
+        org = (int((org[0] + most_left[0]) / 2.0), int((org[1] + most_left[1]) / 2.0))
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(img, 'P:%02d|Y:%02d|S:%02d' % (int(prob * 100), int(co * 100), int(ty * 100)), org, font, 0.4, (255, 0, 0), 2)
+
+    res = 0.5 * image + 0.5 * img
+    res = res.astype(np.uint8)
+    return res
 
 def image_draw_line_cls_list(image, line_cls_list, color = (0, 0, 255), thin = 2):
     img = image.copy()

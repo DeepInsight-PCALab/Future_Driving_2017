@@ -31,6 +31,7 @@ class BaseOptions(object):
         self.parser.add_argument('--checkpoints', type = str, default = './checkpoints',   help = 'models are saved here')
         self.parser.add_argument('--display_winsize', type = int, default = 256, help = 'display window size')
         self.parser.add_argument('--lam',             type = float, default = 0.1,     help = 'loss balance for cls loss')
+        self.parser.add_argument('--lam_attr',        type = float, default = 0.2,     help = 'loss balance for cls loss')
 
     #self.parser.add_argument('--display_freq',     type = int, default = 10, help = 'frequency of showing training results on screen')
     #self.parser.add_argument('--print_freq',       type = int, default = 10, help = 'frequency of showing training results on console')

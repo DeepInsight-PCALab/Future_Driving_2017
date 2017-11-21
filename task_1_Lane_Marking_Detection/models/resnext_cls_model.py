@@ -15,7 +15,7 @@ import sys
 sys.path.append('..')
 sys.path.append('../..')
 #from common import image_draw_line_list, image_draw_dot_line_list, image_draw_half_line_list, image_draw_line_cls_list
-from common import image_draw_line_cls_list
+from common import image_draw_line_cls_list, image_draw_line_cls_list_dot
 
 
 class ResNeXtClsModel(BaseModel):
@@ -24,7 +24,7 @@ class ResNeXtClsModel(BaseModel):
         
         nb    = opt.batchSize
         sizeH, sizeW = opt.fineH, opt.fineW
-        self.lam = opt.lam
+    
         self.input_               = self.Tensor(nb, opt.input_nc, sizeH, sizeW)
         self.label_cls_           = self.Tensor(nb, 1, sizeH, sizeW)
         self.label_cls_mask_      = self.Tensor(nb, 1, sizeH, sizeW)
@@ -118,11 +118,11 @@ class ResNeXtClsModel(BaseModel):
         self.label_type_mask= Variable(self.label_type_mask_)
 
         self.pre_cls, self.pre_up, self.pre_down, self.pre_color, self.pre_type = self.net(self.input)
-        self.loss_cls   = F.binary_cross_entropy(self.pre_cls, self.label_cls, weight = self.label_cls_mask * self.lam)
+        self.loss_cls   = F.binary_cross_entropy(self.pre_cls, self.label_cls, weight = self.label_cls_mask * self.opt.lam)
         self.loss_up    = self.criterion(self.pre_up   * self.label_up_mask,   self.label_up * self.label_up_mask)
         self.loss_down  = self.criterion(self.pre_down * self.label_down_mask, self.label_down * self.label_down_mask)
-        self.loss_color = F.binary_cross_entropy(self.pre_color, self.label_color, weight = self.label_color_mask * (self.lam))
-        self.loss_type  = F.binary_cross_entropy(self.pre_type,  self.label_type,  weight = self.label_type_mask  * (self.lam))
+        self.loss_color = F.binary_cross_entropy(self.pre_color, self.label_color, weight = self.label_color_mask * (self.opt.lam_attr))
+        self.loss_type  = F.binary_cross_entropy(self.pre_type,  self.label_type,  weight = self.label_type_mask  * (self.opt.lam_attr))
 
 
     def optimize_parameters(self):
@@ -266,6 +266,7 @@ class ResNeXtClsModel(BaseModel):
         lanes = self.decode_lanes(cls, up, down, color, type, threshold)
         lanes = self.nms(lanes, 10)
         img = image_draw_line_cls_list(img, lanes)
+        #img = image_draw_line_cls_list_dot(img, lanes)
         return img
 
     def get_current_visuals(self, threshold):

@@ -90,6 +90,19 @@ class Transformer():
                             if not (ty == 0 or ty == 1):
                                 type_mask[fea_y][fea_x] = 0.0
 
+            # append up 3 points
+            keys = ldict.keys()
+            keys.reverse()
+            if len(keys) >= 2:
+                for i in xrange(3):
+                    k1 = keys[-1]
+                    k2 = keys[-2]
+                    nv = 2.0 * k1 - k2
+                    if nv > 0:
+                        ldict[nv] = 2.0 * ldict[k1] - ldict[k2]
+                        keys.append(nv)
+                    else:
+                        break
             lane_dict.append(ldict)
 
         # filling class matrix
@@ -147,22 +160,20 @@ class Transformer():
                 # for up
                 y_start = stdy
                 y_id    = 0
+                scale   = 1.0
                 while True:
                     if not y_start in ld.keys():
                         break
                     dx = ld[y_start] - stdx
                     res_up[y_id + 1][h][w]      = dx
-                    res_up_mask[y_id + 1][h][w] = 1
+                    res_up_mask[y_id + 1][h][w] = 1 * scale
+                    scale   += 0.05
                     y_id    += 1
                     y_start -= slice_step_y
                 # number to regress
+                # add three more to regress up can be put up in ldict ''' for i in xrange(3): if y_id - 1 > 0 and y_id + 1  < self.opt.slicing + 1: #assert(res_up_mask[y_id + i][h][w] == 1 and res_up_mask[y_id + i - 1][h][w] == 1 and res_up_mask[y_id + 1 + i][h][w] == 0) res_up[y_id + 1][h][w]       = 2.0 * res_up[y_id][h][w] - res_up[y_id + i][h][w] res_up_mask[y_id + 1 ][h][w] = 1 y_id += 1 else: break '''
                 res_up[0][h][w]      = y_id
                 res_up_mask[0][h][w] = 1
-                # add three more to regress up
-                for i in xrange(3):
-                    if y_id + i - 1 >= 0:
-                        res_up[y_id + 1 + i][h][w]      = 2.0 * res_up[y_id + i][h][w] - res_up[y_id + i - 1][h][w]
-                        res_up_mask[y_id + 1 + i][h][w] = 1
                 
                 y_start = stdy + slice_step_y
                 y_id    = 0
@@ -173,19 +184,27 @@ class Transformer():
                     dx = ld[y_start] - stdx
                     res_down[y_id + 1][h][w]      = dx
                     res_down_mask[y_id + 1][h][w] = 1
-
+                    y_id    += 1
                     # down add three more out most
                     if self.isout([ld[y_start], y_start]):
                         out_time += 1
                     if out_time == 3:
                         break
-
-                    y_id    += 1
                     y_start += slice_step_y
+
+                # add more
+                for i in xrange(3 - out_time):
+                    if y_id - 1 > 0 and y_id + 1  < self.opt.slicing + 1:
+                        res_down[y_id + 1][h][w]      = 2.0 * res_down[y_id][h][w] - res_down[y_id - 1][h][w]
+                        res_down_mask[y_id + 1][h][w] = 1
+                        y_id   += 1
+                    else:
+                        break
 
                 # number to regress
                 res_down[0][h][w]      = y_id
                 res_down_mask[0][h][w] = 1
+
         d = {'cls': res_cls, 'cls_mask': res_cls_mask, 'up': res_up, 'up_mask': res_up_mask, 'down': res_down, 'down_mask': res_down_mask,
              'color': res_color, 'color_mask': res_color_mask, 'type': res_type, 'type_mask': res_type_mask}
         #return res_cls, res_cls_mask, res_up, res_up_mask, res_down, res_down_mask
