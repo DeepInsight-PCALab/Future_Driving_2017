@@ -19,3 +19,5 @@ python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name
 python test_xml.py --name lane_resnext101_9000_cpustore --gpu_ids -1 --test_dir /data3/XJTU2017/task_1/TSD-Lane/ --results_xml_dir /data3/XJTU2017/tmpdata/results_xml_cpu/ --cls_thres 0.9
 python test_cls_xml.py --name lane_resnext101_cls --depth 101 --gpu_ids 6 --test_dir /data3/XJTU2017/task_1/TSD-Lane/ --results_xml_dir /data3/XJTU2017/tmpdata/results_xml_cls/ --cls_thres 0.9
 python test_cls_xml.py --name lane_resnext101_cls --depth 101 --gpu_ids 6 --test_dir /data3/XJTU2017/tmpdata/test/ --results_xml_dir /data3/XJTU2017/tmpdata/results_test/ --cls_thres 0.9
+
+python test_cls_xml.py --name task_1 --depth 152 --gpu_ids 0 --test_dir /home/liangchen/Desktop/FC2017/task_1/TSD-Lane/ --results_xml_dir /home/liangchen/Desktop/Results/task_1/ --cls_thres 0.9
