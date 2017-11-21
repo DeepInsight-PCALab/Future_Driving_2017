@@ -53,8 +53,8 @@ class BaseModel(object):
 
     def load_network(self, network, network_label, epoch_label):
         save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
-        print 'load network from %s' % save_filename
         save_path     = os.path.join(self.save_dir, save_filename)
+        print 'load network from %s' % save_path
         network.load_state_dict(torch.load(save_path))
 
     def update_learning_rate(self, epoch):
