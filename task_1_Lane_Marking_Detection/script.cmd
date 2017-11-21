@@ -14,6 +14,7 @@ python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name
 python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name lane_resnext101_cls --gpu_ids 1,0,5 --batchSize 48 --model resnext_cls --pretrain ./checkpoints/lane_resnext101_9000_cpustore/latest_net_resnext101.pth --finetune_cls 0  --schedule 100,150,200,225
 python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name lane_resnext152_cls --gpu_ids 2,3,4 --batchSize 30 --model resnext_cls --depth 152 --finetune_cls 0  --schedule 100,150,200,225
 python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name lane_resnext152_cls_ud3 --gpu_ids 1,0,5,6 --batchSize 48 --model resnext_cls --depth 152 --finetune_cls 0  --schedule 100,150,200,225
+python train.py --dataroot /data3/DeepInsight/Lane_PAMI/Datasets/tolabel/ --name lane_debug --gpu_ids 7 --batchSize 12 --model resnext_cls --depth 101 --finetune_cls 0 --cutout 20 --schedule 100,150,200,225
 
 
 python test_xml.py --name lane_resnext101_9000_cpustore --gpu_ids -1 --test_dir /data3/XJTU2017/task_1/TSD-Lane/ --results_xml_dir /data3/XJTU2017/tmpdata/results_xml_cpu/ --cls_thres 0.9

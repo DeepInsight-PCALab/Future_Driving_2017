@@ -38,8 +38,9 @@ class Transformer():
         record_min = np.ones((self.opt.feaH, self.opt.feaW)) * float('inf')
 
         color      = torch.zeros(self.opt.feaH, self.opt.feaW)
+        color_mask = torch.zeros(self.opt.feaH, self.opt.feaW)
         type       = torch.zeros(self.opt.feaH, self.opt.feaW)
-        attr_mask  = torch.zeros(self.opt.feaH, self.opt.feaW)
+        type_mask  = torch.zeros(self.opt.feaH, self.opt.feaW)
         
         slice_step_y = self.opt.fineH / self.opt.slicing
         y_slices = range(0, self.opt.fineH, slice_step_y)       
@@ -77,7 +78,17 @@ class Transformer():
                             record[fea_y][fea_x]     = lane_id
                             color[fea_y][fea_x]      = attr_array[lane_id][0]
                             type[fea_y][fea_x]       = attr_array[lane_id][1]
-                            attr_mask[fea_y][fea_x]  = 1.0
+
+                            # check legal ''' tmp = color[fea_y][fea_x] assert tmp == 0 or tmp == 1, 'color = %d, not right' % (tmp) tmp = type[fea_y][fea_x] assert tmp == 0 or tmp == 1, 'type = %d, not right' % (tmp) '''
+                            color_mask[fea_y][fea_x]  = 1.0
+                            co = color[fea_y][fea_x]
+                            if not (co == 0 or co == 1):
+                                color_mask[fea_y][fea_x] = 0.0
+
+                            type_mask[fea_y][fea_x]  = 1.0
+                            ty = type[fea_y][fea_x]
+                            if not (ty == 0 or ty == 1):
+                                type_mask[fea_y][fea_x] = 0.0
 
             lane_dict.append(ldict)
 
@@ -111,7 +122,9 @@ class Transformer():
         res_cls_mask = torch.from_numpy(cls_mask).unsqueeze(0).float() #.unsqueeze(0).float()
         res_color    = color.unsqueeze(0).float()
         res_type     = type.unsqueeze(0).float()
-        res_attr_mask= attr_mask.unsqueeze(0).float()
+        #res_attr_mask= attr_mask.unsqueeze(0).float()
+        res_color_mask = color_mask.unsqueeze(0).float()
+        res_type_mask  = type_mask.unsqueeze(0).float()
 
         # filling up, down
         res_up        = torch.zeros((self.opt.slicing + 1, self.opt.feaH, self.opt.feaW))
@@ -174,7 +187,7 @@ class Transformer():
                 res_down[0][h][w]      = y_id
                 res_down_mask[0][h][w] = 1
         d = {'cls': res_cls, 'cls_mask': res_cls_mask, 'up': res_up, 'up_mask': res_up_mask, 'down': res_down, 'down_mask': res_down_mask,
-             'color': res_color, 'color_mask': res_attr_mask, 'type': res_type, 'type_mask': res_attr_mask}
+             'color': res_color, 'color_mask': res_color_mask, 'type': res_type, 'type_mask': res_type_mask}
         #return res_cls, res_cls_mask, res_up, res_up_mask, res_down, res_down_mask
         return d
 
@@ -247,12 +260,14 @@ class Transformer():
             width, height = image.size
             if width != self.opt.loadW or height != self.opt.loadH:
                 image = image.resize((self.opt.loadW, self.opt.loadH), Image.BILINEAR)
+
             # ------------------------------------------------------------------------
             # crop !
             # parallel gao image and label
             dx = random.randint(0, self.opt.dw)
             dy = random.randint(0, self.opt.dh)
             image = image.crop((dx, dy, dx + self.opt.fineW, dy + self.opt.fineH))
+
             for i in xrange(len(lane_array)):
                 lane_array[i][0] = lane_array[i][0] - dx
                 lane_array[i][1] = lane_array[i][1] - dy
@@ -267,6 +282,19 @@ class Transformer():
                     lane_array[i][0] = self.opt.fineW - 1 - lane_array[i][0]
         
         image = self.totensor(image)
+        # ------------------------------------------------------------------------
+        # cutout!
+        if self.opt.cutout > 0:
+            C, height, width = image.shape
+            assert(C == 3 and height == self.opt.fineH and width == self.opt.fineW)
+            cx = random.randint(0, width - 1)
+            cy = random.randint(int(2.0 / 3 * height), height - 1)
+            edge = self.opt.cutout / 2
+            lp = (cx - edge if cx > edge else 0, cy - edge if cy > edge else 0)
+            rp = (cx + edge if cx + edge <= width else width, cy + edge if cy + edge <= height else height)
+            # cutout
+            image[:, lp[1]: rp[1], lp[0]: rp[0]] = 0
+
         label = self.label_feature(lane_array, attr_array)
         #print('image.shape = ', image.shape)
         return image, label

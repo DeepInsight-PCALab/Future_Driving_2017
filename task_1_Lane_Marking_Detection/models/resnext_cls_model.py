@@ -122,7 +122,7 @@ class ResNeXtClsModel(BaseModel):
         self.loss_up    = self.criterion(self.pre_up   * self.label_up_mask,   self.label_up * self.label_up_mask)
         self.loss_down  = self.criterion(self.pre_down * self.label_down_mask, self.label_down * self.label_down_mask)
         self.loss_color = F.binary_cross_entropy(self.pre_color, self.label_color, weight = self.label_color_mask * (self.lam))
-        self.loss_type  = F.binary_cross_entropy(self.pre_type, self.label_type, weight = self.label_type_mask * (self.lam))
+        self.loss_type  = F.binary_cross_entropy(self.pre_type,  self.label_type,  weight = self.label_type_mask  * (self.lam))
 
 
     def optimize_parameters(self):
