@@ -1,22 +1,41 @@
 <?xml version="1.0" encoding="gbk"?>
 <opencv_storage>
- <Frame00001TargetNumber>2</Frame00001TargetNumber>
- <Frame00001Target00000>
-  <Type>白色实线</Type>
-  <Position type_id="opencv-matrix">
-   <rows>2</rows>
-   <cols>1</cols>
-   <dt>''2i''</dt>
-   <data>1 2 3 4</data>
-  </Position>
- </Frame00001Target00000>
- <Frame00001Target00001>
-  <Type>白色实线</Type>
-  <Position type_id="opencv-matrix">
-   <rows>4</rows>
-   <cols>1</cols>
-   <dt>''2i''</dt>
-   <data>1 1 1 1 1 1 1 1</data>
-  </Position>
- </Frame00001Target00001>
+<Frame00000TargetNumber>2</Frame00000TargetNumber>
+<Frame00000Target00000>
+	<Type>"黄色虚线"</Type>
+	<Position type_id="opencv-matrix">
+		<rows>2</rows>
+		<cols>1</cols>
+		<dt>"2i"</dt>
+		<data>1 2 3 4</data>
+	</Position>
+</Frame00000Target00000>
+<Frame00000Target00001>
+	<Type>"白色实线"</Type>
+	<Position type_id="opencv-matrix">
+		<rows>2</rows>
+		<cols>1</cols>
+		<dt>"2i"</dt>
+		<data>3 4 6 7</data>
+	</Position>
+</Frame00000Target00001>
+<Frame00001TargetNumber>2</Frame00001TargetNumber>
+<Frame00001Target00000>
+	<Type>"黄色虚线"</Type>
+	<Position type_id="opencv-matrix">
+		<rows>2</rows>
+		<cols>1</cols>
+		<dt>"2i"</dt>
+		<data>1 2 3 4</data>
+	</Position>
+</Frame00001Target00000>
+<Frame00001Target00001>
+	<Type>"白色虚线"</Type>
+	<Position type_id="opencv-matrix">
+		<rows>3</rows>
+		<cols>1</cols>
+		<dt>"2i"</dt>
+		<data>3 4 6 7 8 9</data>
+	</Position>
+</Frame00001Target00001>
 </opencv_storage>
