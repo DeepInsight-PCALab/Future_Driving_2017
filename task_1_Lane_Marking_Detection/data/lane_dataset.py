@@ -19,7 +19,8 @@ class LaneDataset(data.Dataset):
         self.phase = phase
         self.root  = opt.dataroot
         #self.dir   = os.path.join(opt.dataroot, phase)
-        self.label_file = os.path.join(opt.dataroot, phase + '.json')
+        self.label_file = os.path.join(opt.dataroot, opt.json + '.json')
+        print 'load label_file ...', self.label_file
 
         #self.paths  = make_dataset(self.dir)
         #self.paths  = sorted(self.paths)

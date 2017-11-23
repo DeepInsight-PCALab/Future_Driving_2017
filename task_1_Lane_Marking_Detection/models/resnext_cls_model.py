@@ -15,7 +15,7 @@ import sys
 sys.path.append('..')
 sys.path.append('../..')
 #from common import image_draw_line_list, image_draw_dot_line_list, image_draw_half_line_list, image_draw_line_cls_list
-from common import image_draw_line_cls_list, image_draw_line_cls_list_dot
+from common import image_draw_line_cls_list 
 
 
 class ResNeXtClsModel(BaseModel):

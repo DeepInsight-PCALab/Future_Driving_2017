@@ -8,8 +8,10 @@ def create_model(opt):
     print(opt.model)
 
     if opt.model == 'resnext':
+        print 'load resnext'
         model = ResNeXtModel(opt)
     elif opt.model == 'resnext_cls':
+        print 'load resnext_cls'
         model = ResNeXtClsModel(opt)
 
     print 'model [%s] was created' % model.name()

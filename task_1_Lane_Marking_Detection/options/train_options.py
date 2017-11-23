@@ -23,6 +23,7 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--lr',               type = float, default = 0.01, help = 'initial learning rate for adam')
         self.parser.add_argument('--debug',            type = int, default = 0,     help = 'debug to print')
 
+        self.parser.add_argument('--json',           type = str, default = 'train',     help = 'json name')
         self.parser.add_argument('--cutout',           type = int, default = -1,     help = 'cutout size for training')
         self.parser.add_argument('--pretrain',         type = str, default = None,     help = 'pretrained model')
         self.parser.add_argument('--finetune_cls',     type = int, default = 0,     help = 'choose to only finetune 2 added color and type layers')

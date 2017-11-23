@@ -167,17 +167,17 @@ class Transformer():
                     dx = ld[y_start] - stdx
                     res_up[y_id + 1][h][w]      = dx
                     res_up_mask[y_id + 1][h][w] = 1 * scale
-                    scale   += 0.05
+                    scale   += 0.1
                     y_id    += 1
                     y_start -= slice_step_y
                 # number to regress
-                # add three more to regress up can be put up in ldict ''' for i in xrange(3): if y_id - 1 > 0 and y_id + 1  < self.opt.slicing + 1: #assert(res_up_mask[y_id + i][h][w] == 1 and res_up_mask[y_id + i - 1][h][w] == 1 and res_up_mask[y_id + 1 + i][h][w] == 0) res_up[y_id + 1][h][w]       = 2.0 * res_up[y_id][h][w] - res_up[y_id + i][h][w] res_up_mask[y_id + 1 ][h][w] = 1 y_id += 1 else: break '''
                 res_up[0][h][w]      = y_id
                 res_up_mask[0][h][w] = 1
                 
                 y_start = stdy + slice_step_y
                 y_id    = 0
                 out_time = 0
+                out_thres = 8
                 while True:
                     if not y_start in ld.keys():
                         break
@@ -185,15 +185,15 @@ class Transformer():
                     res_down[y_id + 1][h][w]      = dx
                     res_down_mask[y_id + 1][h][w] = 1
                     y_id    += 1
-                    # down add three more out most
+                    # down add out_thres more out most
                     if self.isout([ld[y_start], y_start]):
                         out_time += 1
-                    if out_time == 3:
+                    if out_time == out_thres:
                         break
                     y_start += slice_step_y
 
                 # add more
-                for i in xrange(3 - out_time):
+                for i in xrange(out_thres - out_time):
                     if y_id - 1 > 0 and y_id + 1  < self.opt.slicing + 1:
                         res_down[y_id + 1][h][w]      = 2.0 * res_down[y_id][h][w] - res_down[y_id - 1][h][w]
                         res_down_mask[y_id + 1][h][w] = 1
